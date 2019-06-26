@@ -1,0 +1,4 @@
+wtforms
+Flask==1.0.2
+Flask-Script==2.0.6
+Flask-WTF==0.14.2
