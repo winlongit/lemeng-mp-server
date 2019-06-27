@@ -13,6 +13,9 @@ class Config(object):
     # 小程序设置信息
     MP_APPID = "wxd6aefbe7d94175f6"
     MP_SECRET = "bc7544bc72cae20dbef7d10be14b2e77"
+    MP_MCH_ID = "1533695991"
+    HTTPS_ROOT = "https://swu.mynatapp.cc"
+    MP_MCH_KEY = "c9a5241f1d9b1a21659f75cb0e3d82ba"
 
     # 微信设置信息
     WECHAT_APPID = "wxf36645bdd574084f"

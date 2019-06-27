@@ -21,7 +21,7 @@ from app import app
 config = app.config
 from app.utils.mp_login_auth import LoginAuth
 
-bp = Blueprint('xcc_auth', __name__, url_prefix="/xcc")
+bp = Blueprint('xcc_auth', __name__, url_prefix="/xccAuth")
 
 mp_id = config.get('MP_APPID')
 mp_secret = config.get('MP_SECRET')
@@ -39,4 +39,4 @@ def get_json():
     data2 = wx_login_auth.get_access_token(code)
     # 调用上面方法，从返回的json数据里得到 对应数据 openid
     print(data2)
-    return jsonify({"name": "sb", "age": 2})
+    return jsonify(data2)
