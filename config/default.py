@@ -14,7 +14,8 @@ class Config(object):
     MP_APPID = "wxd6aefbe7d94175f6"
     MP_SECRET = "bc7544bc72cae20dbef7d10be14b2e77"
     MP_MCH_ID = "1533695991"
-    HTTPS_ROOT = "https://swu.mynatapp.cc"
+    # 这里不能用 https 地址，吃了大亏
+    HTTP_ROOT = "http://swu.mynatapp.cc"
     MP_MCH_KEY = "c9a5241f1d9b1a21659f75cb0e3d82ba"
 
     # 微信设置信息

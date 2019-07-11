@@ -19,9 +19,10 @@ from flask import request, session, Blueprint, jsonify
 # 获取config
 from app import app
 config = app.config
+
 from app.utils.mp_login_auth import LoginAuth
 
-bp = Blueprint('xcc_auth', __name__, url_prefix="/xccAuth")
+bp = Blueprint('xcc_auth', __name__, url_prefix="/wx/user")
 
 mp_id = config.get('MP_APPID')
 mp_secret = config.get('MP_SECRET')

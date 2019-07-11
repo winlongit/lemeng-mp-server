@@ -17,11 +17,13 @@ import random
 import time
 import urllib.request
 from xml.etree import ElementTree as eTree
+from wechatpy.pay import WeChatPay
 
 from flask import Blueprint, jsonify
 
 from app import app
 from app.utils.wechat_base import Map
+from wechatpy import WeChatPay
 
 try:
     from flask import request
@@ -29,18 +31,65 @@ except Exception:
     request = None
 
 config = app.config
-bp = Blueprint('xcc_pay', __name__, url_prefix="/xccPay")
+bp = Blueprint('xcc_pay', __name__, url_prefix="/wx/pay")
 
 mp_id = config.get('MP_APPID')
 mp_secret = config.get('MP_SECRET')
 mp_mch_id = config.get('MP_MCH_ID')
 mp_mch_key = config.get('MP_MCH_KEY')
-https_root = config.get('HTTPS_ROOT')
-notify_url = https_root + '/xccPay/notifyurl'
+# 这里吃的大亏，回调地址不能用 https ， fuck
+http_root = config.get('HTTP_ROOT')
+notify_url = http_root + '/wx/pay/notifyurl'
 
 mch_key = config.get('WECHAT_MCH_KEY')
+"""
+appid – 微信公众号/或者小程序号
+api_key – 商户 key, 不要在这里使用小程序的密钥
+mch_id – 商户号
+(sub_mch_id – 可选，子商户号，受理模式下必填，这里不填)
+(mch_cert – 商户证书路径，这里不填)
+mch_key – 必填，商户证书私钥路径(小程序，这里也填商户号key)
+timeout – 可选，请求超时时间，单位秒，默认无超时设置
+sandbox – 可选，是否使用测试环境，默认为 False
+"""
+wx_pay = WeChatPay(appid=mp_id,
+                   mch_id=mp_mch_id,
+                   mch_key=mp_mch_key,
+                   api_key=mp_mch_key)
 
 
+@bp.route("/reqPay", methods=["POST", "GET"])
+def get_json1():
+    # 这里还有一个 请求 sign 的构造过程， wechatpy 都已经封装好了
+    rs = wx_pay.order.create(trade_type="JSAPI",
+                             total_fee=1,  # 订单总金额，单位为分
+                             notify_url=notify_url,  # 异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的 http 地址，不能是 https ，不能携带参数。
+                             user_id=request.args.get("openid"),  # 微信分配的小程序ID,擦嘞
+                             body="测试",  # 商品详细描述，对于使用单品优惠的商户，该字段必须按照规范上传
+                             client_ip=request.remote_addr,  # 这就是 spbill_create_ip，换两个名字
+                             out_trade_no=str(int(time.time())),  # 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一
+                             )
+    # 获取 paySign
+    # paySign wx_pay.jsapi.get_jsapi_signature(rs["prepay_id"])
+    jsapi_params = wx_pay.jsapi.get_jsapi_params(rs["prepay_id"])
+    return jsonify(jsapi_params)
+
+
+# 微信推送消息是XML格式，使用wechatpy的parse_payment_result方法可以将结果转化成OrderedDict类型，且帮你做好了验签。
+@bp.route("/notifyurl", methods=["GET", "POST"])
+def get_notify_url():
+    notify_data = request.data
+    print(notify_data)
+    data = wx_pay.parse_payment_result(notify_data)
+    print(data)
+    # 然后就可以根据返回的结果，处理之前的订单了。
+    # TODO 写上处理结果的逻辑。存储数据库之类的
+    # 唯一需要注意的一点，微信推送消息后，需要给微信服务器返回一个消息：
+    return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>"
+
+
+"""  之前没用 wechatpy ， 自己手动写的方法， 能用，但是有现成的封装好的不是更好吗
+    感谢 wechatpy 的作者 https://wechatpy.readthedocs.io/zh_CN/master/pay.html#module-wechatpy.pay
 # 生成随机字符串，长度要求在32位以内
 def creat_nonce_str():
     ascii_lowercase = 'abcdefghijklmnopqrstuvwxyz'
@@ -113,10 +162,8 @@ def pay_send_get(url, xml_data):
 
     # 得到了返回的xml，并且转成dict类型
     return res_data
-
-
 # python小程序付款参考： https://www.jianshu.com/p/07ed48e4a50b
-@bp.route("/reqPay", methods=["POST", "GET"])
+@bp.route("/reqPay1", methods=["POST", "GET"])
 def get_json():
     spbill_create_ip = request.remote_addr
     openid = request.args.get("openid")
@@ -150,42 +197,23 @@ def get_json():
         'appId': mp_id,  # 微信分配的小程序ID 擦嘞，这里的appId 的 I 是大写
         'timeStamp': str(int(time.time())),  # 时间戳从1970年1月1日00:00:00至今的秒数,即当前的时间
         'nonceStr': creat_nonce_str(),  # 随机字符串，不长于32位
-        'package': 'prepay_id={0}'.format(prepay_id),  # 统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=wx2017033010242291fcfe0db70013231072
+        'package': 'prepay_id={0}'.format(prepay_id),
+        # 统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=wx2017033010242291fcfe0db70013231072
         'signType': 'MD5'  # 签名类型，默认为MD5
     }
     # 生成 sign 签名
     get_paySign = sign(paySign_data)
-    print("这次搞到的sign"+get_paySign)
+    print("这次搞到的sign" + get_paySign)
     paySign_data["paySign"] = get_paySign
     print(paySign_data)
     return jsonify(paySign_data)
-
-
-@bp.route("/get_notifyurl", methods=["GET", "POST"])
-def get_notifyurl():
+    
+@bp.route("/notifyurl", methods=["GET", "POST"])
+def get_notify_url():
+    print("yes,here")
     allthings = request.stream.read()
     print(allthings)
-    # if not allthings:
-    #     return setErrorData(XML_NOT_FOUND)
-    # allthings_dict = ET.fromstring(allthings)
-    # return_code = allthings_dict.find('return_code').text
-    # if return_code != 'SUCCESS':
-    #     return setErrorData(XML_NOT_FOUND)
-    # o_t_n = allthings_dict.find('out_trade_no').text
-    # data = {"out_trade_no": o_t_n}
-    # result_dict = wx_pay.order_query(**data)
-
-    # 得到了 查询返回的数据dict,把需要的数据展示出来，给用户看就行。下面必须判断result_code，方便把数据库里的信息修改
-    # if result_dict.result_code == "FAIL":
-    #     return setErrorData(ORDER_NOT_FOUND)
-
-    # out_trade_no = result_dict.out_trade_no
-    # userorder = UserOrder.objects(out_trade_no=out_trade_no).first()
-    # userorder.ischeck = "已支付"
-    # userorder.status = "已支付"
-    # userorder.openid = result_dict.openid
-    # userorder.save()
-
     respData = {'return_code': "SUCCESS"}
     # respData = arrayToXml(respData)
     return to_xml(respData)
+"""
