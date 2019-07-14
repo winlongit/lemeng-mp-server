@@ -52,14 +52,17 @@ mch_key – 必填，商户证书私钥路径(小程序，这里也填商户号k
 timeout – 可选，请求超时时间，单位秒，默认无超时设置
 sandbox – 可选，是否使用测试环境，默认为 False
 """
-wx_pay = WeChatPay(appid=mp_id,
-                   mch_id=mp_mch_id,
-                   mch_key=mp_mch_key,
-                   api_key=mp_mch_key)
+wx_pay = WeChatPay(appid=mp_id, mch_id=mp_mch_id, mch_key=mp_mch_key, api_key=mp_mch_key)
 
 
+# 微信的签名逻辑需要注意：
+#
+#     商户密钥不参与字典序排序
+#     md5后需要转大写
+#     参与排序的字典名要与微信的文档严格保持一致
 @bp.route("/reqPay", methods=["POST", "GET"])
 def get_json1():
+    print(request.args)
     # 这里还有一个 请求 sign 的构造过程， wechatpy 都已经封装好了
     rs = wx_pay.order.create(trade_type="JSAPI",
                              total_fee=1,  # 订单总金额，单位为分

@@ -3,3 +3,6 @@ Flask==1.0.2
 Flask-Script==2.0.6
 Flask-WTF==0.14.2
 wechatpy[cryptography]
+flask_mongoengine
+# mongodb 存储图片 imageField 需要 PIL 包
+Pillow

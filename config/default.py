@@ -27,7 +27,7 @@ class Config(object):
     WECHAT_ROOT = "http://task.cocotask.com/wechat"  # 微信根目录，结尾不带"/"
 
     MONGODB_SETTINGS = {'ALIAS': 'default',
-                        'DB': 'cocotask',
+                        'DB': 'xcc_binishou',
                         'host': 'localhost',
                         'username': 'admin',
                         'password': ''}
@@ -36,7 +36,8 @@ class Config(object):
     # Flask app config
     DEBUG = True
     TESTING = True
-
+    # secret_key 实际上是用来加密字符串的, 如果在实例化的app中没有secret_key那么开启session一定会抛异常的
+    # 他是用来给 session 加密解密用的,因为flask的session会将你的SessionID存放在客户端的Cookie中
     SECRET_KEY = "\xb5\xb3}#\xb7A\xcac\x9d0\xb6\x0f\x80z\x97\x00\x1e\xc0\xb8+\xe9)\xf0}"
 
     # Root path of project
