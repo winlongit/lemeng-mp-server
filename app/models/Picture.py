@@ -18,10 +18,11 @@ from app.dbengines import db
 
 
 class Picture(db.Document):
+    creator = db.StringField(max_length=255, verbose_name='上传者，创建人 id')
+
     image = db.ImageField(verbose_name='图片', thumbnail_size=(200, 200, True))
     img_type = db.StringField(max_length=64, verbose_name='图片type')
     family = db.StringField(max_length=64, verbose_name='分类')
-    creator = db.StringField(max_length=255, verbose_name='上传者，创建人 id')
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
 
     def __unicode__(self):

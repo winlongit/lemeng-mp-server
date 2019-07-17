@@ -16,9 +16,9 @@
 from Task import Task
 from User import User
 from Picture import Picture
-
-__all__ = ['Task', 'User', 'Picture']
-
+from TaskOrder import TaskOrder
+from TaskRecord import TaskRecord
+__all__ = ['Task', 'User', 'Picture', 'TaskOrder', 'TaskRecord']
 
 
 if __name__ == '__main__':

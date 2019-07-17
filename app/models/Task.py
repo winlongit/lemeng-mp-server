@@ -15,7 +15,7 @@
 # 这里使用 from db import db ,不要用 from . import db ( from . 就是从 __init__ 中找，__init__ 需要依赖咱们，咱们又去依赖 __init__，造成循环依赖，应该避免这种情况)
 from app.dbengines import db
 import datetime
-
+from Picture import Picture
 
 class Task(db.Document):
     """
@@ -38,15 +38,18 @@ class Task(db.Document):
         ReferenceField (using wtforms.fields.SelectFieldBase with options loaded from QuerySet or Document)
         DictField
     """
+    creator_openid = db.StringField(max_length=255, verbose_name='创建人：用户在小程序中对应的 openid')
+
     title = db.StringField(max_length=255, verbose_name='标题')
     current_weight = db.IntField(verbose_name='当前体重')
     goal_weight = db.IntField(verbose_name='目标体重')
-    # task_image = db.ImageField(verbose_name='封面配图')
-    creator_openid = db.StringField(max_length=255, verbose_name='创建人：用户在小程序中对应的 openid')
+    task_image = db.ReferenceField(Picture, verbose_name='封面配图')
     dead_line = db.DateTimeField(verbose_name='挑战设定的 结束时间,到期时间')
     status = db.IntField(verbose_name='任务状态：（1：初始化刚、创建）（ 2：进行中） （4：成功结束）（8：失败结束)')
     complete_time = db.DateTimeField(verbose_name='挑战实际的 结束时间,到期时间')
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
+    challenge_success_betting = db.IntField(verbose_name='胜利投注总金额，单位是分')
+    challenge_fail_betting = db.IntField(verbose_name='失败投注总金额，单位是分')
 
     meta = {'allow_inheritance': True}
 

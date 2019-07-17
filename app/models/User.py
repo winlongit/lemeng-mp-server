@@ -1,4 +1,5 @@
 from app.dbengines import db
+from Picture import Picture
 import datetime
 
 
@@ -13,7 +14,7 @@ class User(db.Document):
     city = db.StringField(verbose_name='市')
     area = db.StringField(verbose_name='区')
     address = db.StringField(verbose_name='地址')
-    avatar = db.ImageField(verbose_name='头像')
+    avatar = db.ReferenceField(Picture, verbose='头像')
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
     update_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='更新时间')
 
