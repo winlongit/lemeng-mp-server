@@ -18,7 +18,8 @@ __author__ = 'Max_Pengjb'
 from flask import Flask, current_app, session, g, request, jsonify, Response
 from config import load_config
 from app.dbengines import db
-
+# TODO socket.io 语音对话，后期再加吧
+# from app.socketio import socket_io
 # 初始化 App
 app = Flask(__name__)
 
@@ -26,6 +27,9 @@ config = load_config()
 # 加载配置
 app.config.from_object(config)
 db.init_app(app)
+# TODO socket.io 语音对话，后期再加吧
+# socket_io.init_app(app)
+
 print(config.DD)
 print(config.FF)
 # 整合各个route页面
@@ -72,13 +76,14 @@ def img_upload():
     img_obj = request.files.get("img")
     filename = img_obj.filename
     img_type = filename[filename.rfind(".")+1:]
-    print(request.args)
     from app.models import Picture
     # pic = Picture(image=img_obj)
     pic = Picture(family="avatar", creator="user open id", img_type=img_type)
     # 添加图片，并且 追加一个 content_type 属性进去,回头返回的时候，也好填写 Conten-Type 啊
     pic.image.put(img_obj, content_type=img_obj.content_type)
     rs = pic.save()
+    print(rs.to_mongo())
+    print(rs.id)
     return jsonify(rs)
 
 
@@ -97,7 +102,7 @@ def img_download():
     from app.models import User
     user = User.objects.get(id=ObjectId("5d29c4e380e1ec3a15da853c"))
     # 获取 头像 的 ImageGridFsProxy
-    image_gfs_proxy = user.avatar
+    image_gfs_proxy = user.avatar.image
     print(user.to_mongo())
     print(image_gfs_proxy.content_type)
     print(image_gfs_proxy)

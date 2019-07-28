@@ -65,6 +65,8 @@ class LoginAuth:
         args = dict()
         args.setdefault("appid", self.mp_id)
         args.setdefault("secret", self.mp_secret)
+        print("mp_id: ",self.mp_id)
+        print("mp_secret: ",self.mp_secret)
         print("code:", code)
         args.setdefault("js_code", code)
         args.setdefault("grant_type", "authorization_code")

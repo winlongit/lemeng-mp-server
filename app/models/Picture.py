@@ -26,4 +26,4 @@ class Picture(db.Document):
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
 
     def __unicode__(self):
-        return str(self.name)
+        return str(self.creator)

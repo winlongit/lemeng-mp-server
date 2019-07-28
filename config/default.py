@@ -10,9 +10,16 @@ class Config(object):
 
     SITE_ROOT = "http://task.cocotask.com/"
 
-    # 小程序设置信息
+    # TODO 这里下面的所有配置都要全部大写，不然识别不到，不知道为什么，有待查找一下原因
+    # 小程序设置信息-比你兽
     MP_APPID = "wxd6aefbe7d94175f6"
     MP_SECRET = "bc7544bc72cae20dbef7d10be14b2e77"
+
+    # 小程序设置信息-小精灵
+    MP_APPID_EFL = "wx1b9b0e6f51b9c14e"
+    MP_SECRET_EFL = "775e312fc8f20fde338b1b81511207a5"
+
+    # 商户号信息
     MP_MCH_ID = "1533695991"
     # 这里不能用 https 地址，吃了大亏
     HTTP_ROOT = "http://swu.mynatapp.cc"

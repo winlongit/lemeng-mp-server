@@ -6,3 +6,6 @@ wechatpy[cryptography]
 flask_mongoengine
 # mongodb 存储图片 imageField 需要 PIL 包
 Pillow
+flask-socketio
+chatterbot
+chatterbot_corpus
