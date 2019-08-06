@@ -1,3 +1,4 @@
+mongoengine
 wtforms
 Flask==1.0.2
 Flask-Script==2.0.6
@@ -9,3 +10,4 @@ Pillow
 flask-socketio
 chatterbot
 chatterbot_corpus
+requests
