@@ -64,6 +64,8 @@ def index():
     # 下面的例子, 通过g传递了一个名字叫做"Peng", 使用g之前也需要激活程序上下文:
     g.name = "Peng"
     print(g.name)
+    if request.args.get("openid"):
+        print(request.args.get("openid"))
     print(session.get("user"))
     # 如果dict中存在key，则返回key的值， 如果不存在key，则返回default的值，
     # 并且在dict中增加key: default键值对，如果 default不存在，则在dict增加key: None的键值对。

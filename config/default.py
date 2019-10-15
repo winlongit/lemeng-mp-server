@@ -19,6 +19,10 @@ class Config(object):
     MP_APPID_EFL = "wx1b9b0e6f51b9c14e"
     MP_SECRET_EFL = "775e312fc8f20fde338b1b81511207a5"
 
+    # 小程序设置信息-商城
+    MP_APPID_SHOP = "wx7dd25cb33bbd8976"
+    MP_SECRET_SHOP = "69b0eca2c8468e8dc9e12fade9ae3274"
+
     # 商户号信息
     MP_MCH_ID = "1533695991"
     # 这里不能用 https 地址，吃了大亏

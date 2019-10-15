@@ -17,6 +17,7 @@ from app.dbengines import db
 import datetime
 from Picture import Picture
 
+
 class Task(db.Document):
     """
     Supported fields

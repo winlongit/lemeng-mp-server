@@ -8,6 +8,10 @@ flask_mongoengine
 # mongodb 存储图片 imageField 需要 PIL 包
 Pillow
 flask-socketio
-chatterbot
+chatterbot==1.0.5
 chatterbot_corpus
 requests
+markupsafe
+six
+pytz
+pyyaml==3.13

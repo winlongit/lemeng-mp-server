@@ -31,8 +31,13 @@ mp_secret = config.get('MP_SECRET')
 mp_id_efl = config.get('MP_APPID_EFL')
 mp_secret_efl = config.get('MP_SECRET_EFL')
 
+mp_id_shop = config.get('MP_APPID_SHOP')
+mp_secret_shop = config.get('MP_SECRET_SHOP')
+
 wx_login_auth = LoginAuth(mp_id, mp_secret)
 wx_login_auth_efl = LoginAuth(mp_id_efl, mp_secret_efl)
+wx_login_auth_shop = LoginAuth(mp_id_shop, mp_secret_shop)
+
 
 # GET https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
 @bp.route("/login", methods=["POST", "GET"])
@@ -47,7 +52,8 @@ def get_json():
     print(data2)
     return jsonify(data2)
 
-# 有2个小程序，先分开写吧，后面再传参根据不同选择不同的 appid，来统一接口，现在先直接写，节约时间
+
+# 有3个小程序，先分开写吧，后面再传参根据不同选择不同的 appid，来统一接口，现在先直接写，节约时间
 # TODO
 @bp.route("/login_efl", methods=["POST", "GET"])
 def get_json_efl():
@@ -62,5 +68,24 @@ def get_json_efl():
     from app.models.EFLUser import EFLUser
     if not EFLUser.objects(xcc_openid=data2.openid):
         user = EFLUser(xcc_openid=data2.openid)
+        user.save()
+    return jsonify(data2)
+
+
+# 有3个小程序，先分开写吧，后面再传参根据不同选择不同的 appid，来统一接口，现在先直接写，节约时间
+# TODO
+@bp.route("/login_shop", methods=["POST", "GET"])
+def get_json_shop():
+    data = request.get_json()
+    code = data["code"]
+    print(data)
+    print(code)
+    # 用code换取需要的access_token
+    data2 = wx_login_auth_shop.get_access_token(code)
+    # 调用上面方法，从返回的json数据里得到 对应数据 openid
+    print(data2)
+    from app.models.User import User
+    if not User.objects(xcc_openid=data2.openid):
+        user = User(xcc_openid=data2.openid)
         user.save()
     return jsonify(data2)
