@@ -13,15 +13,19 @@
 -------------------------------------------------
 """
 from bson import ObjectId
+from flask_cors import CORS
 
 __author__ = 'Max_Pengjb'
 from flask import Flask, current_app, session, g, request, jsonify, Response
 from config import load_config
 from app.dbengines import db
+
 # TODO socket.io 语音对话，后期再加吧
 # from app.socketio import socket_io
 # 初始化 App
 app = Flask(__name__)
+# 跨域 flask-cors 全局跨域设置
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 config = load_config()
 # 加载配置
@@ -29,6 +33,7 @@ app.config.from_object(config)
 db.init_app(app)
 # TODO socket.io 语音对话，后期再加吧
 # socket_io.init_app(app)
+
 
 print(config.DD)
 print(config.FF)
@@ -75,9 +80,12 @@ def index():
 
 @app.route("/img/img_upload", methods=['POST'])
 def img_upload():
+    # for attr in dir(request):
+    #     print(attr, getattr(request, attr))
+    # print("request.files", request.files)
     img_obj = request.files.get("img")
     filename = img_obj.filename
-    img_type = filename[filename.rfind(".")+1:]
+    img_type = filename[filename.rfind(".") + 1:]
     from app.models import Picture
     # pic = Picture(image=img_obj)
     pic = Picture(family="avatar", creator="user open id", img_type=img_type)
@@ -106,6 +114,37 @@ def img_download():
     # 获取 头像 的 ImageGridFsProxy
     image_gfs_proxy = user.avatar.image
     print(user.to_mongo())
+    print(image_gfs_proxy.content_type)
+    print(image_gfs_proxy)
+    return Response(image_gfs_proxy.read(),
+                    content_type="image/jpeg",
+                    headers={
+                        'Content-Length': image_gfs_proxy.length
+                    })
+
+
+# element ui 的上传图片
+@app.route("/img/img_upload_ui", methods=['POST'])
+def img_upload_ui():
+    img_obj = request.files.get("file")
+    filename = img_obj.filename
+    img_type = filename[filename.rfind(".") + 1:]
+    from app.models import Picture
+    # pic = Picture(image=img_obj)
+    pic = Picture(family="swipers", creator="user open id", img_type=img_type)
+    # 添加图片，并且 追加一个 content_type 属性进去,回头返回的时候，也好填写 Conten-Type 啊
+    pic.image.put(img_obj, content_type=img_obj.content_type)
+    rs = pic.save()
+    # rs.id 是 objectId： Object of type 'ObjectId' is not JSON serializable，所以这里把它转成字符串str
+    return jsonify({"pic_id": str(rs.id)})
+
+
+@app.route("/img/img_download_ui/<img_id>", methods=['GET', 'POST'])
+def img_download_ui(img_id):
+    from app.models import Picture
+    pic = Picture.objects.get(id=ObjectId(img_id))
+    # 获取 头像 的 ImageGridFsProxy
+    image_gfs_proxy = pic.image
     print(image_gfs_proxy.content_type)
     print(image_gfs_proxy)
     return Response(image_gfs_proxy.read(),

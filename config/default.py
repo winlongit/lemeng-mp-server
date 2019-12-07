@@ -11,6 +11,10 @@ class Config(object):
     SITE_ROOT = "http://task.cocotask.com/"
 
     # TODO 这里下面的所有配置都要全部大写，不然识别不到，不知道为什么，有待查找一下原因
+    # 公众号-服务号
+    WX_APPID = "wxc6221cda3f95b53f"
+    WX_SECRET = "f0e955c30360c2d8aafda507dbb2b908"
+
     # 小程序设置信息-比你兽
     MP_APPID = "wxd6aefbe7d94175f6"
     MP_SECRET = "bc7544bc72cae20dbef7d10be14b2e77"

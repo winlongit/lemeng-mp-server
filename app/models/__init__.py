@@ -18,5 +18,6 @@ from User import User
 from Picture import Picture
 from TaskOrder import TaskOrder
 from TaskRecord import TaskRecord
-__all__ = ['Task', 'User', 'Picture', 'TaskOrder', 'TaskRecord']
+from ShopProduct import Product, OnePicture
 
+__all__ = ['Task', 'User', 'Picture', 'TaskOrder', 'TaskRecord', 'Product', 'OnePicture']

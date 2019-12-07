@@ -15,3 +15,4 @@ markupsafe
 six
 pytz
 pyyaml==3.13
+flask-cors

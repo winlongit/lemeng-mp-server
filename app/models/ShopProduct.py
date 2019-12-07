@@ -1,45 +1,29 @@
 # -*- coding: UTF-8 -*-
 from app.dbengines import db
+from Picture import Picture
 import datetime
 
 
-# 订单管理model
+class OnePicture(db.EmbeddedDocument):
+    order = db.IntField(min_value=1, verbose_name="一组图片中，这张图片的序号")
+    pic_id = db.ReferenceField(Picture, verbose_name="图片在Picture表中的id")
+
+
+# 产品model
 class Product(db.Document):
-    name = db.StringField(max_length=255, verbose_name='名称')
-    price = db.StringField(max_length=255, verbose_name='价格(整数:元)')
-    type = db.StringField(max_length=255, verbose_name='产品分类')
-    test_type = db.StringField(max_length=255, verbose_name='检测方式')
-    post_type = db.StringField(max_length=255, verbose_name='配送方式')
+    name = db.StringField(max_length=255, verbose_name='商品名称')
+    description = db.StringField(max_length=255, verbose_name='商品描述')
+    price = db.IntField(verbose_name='价格(整数:分)，注意单位是分')
+    type = db.StringField(max_length=255, verbose_name='产品分类-一级分类')
+    category = db.StringField(max_length=255, verbose_name='产品分类-二级分类')
+    specification = db.ListField(db.StringField(max_length=255, verbose_name="规格"))
 
-    send_address = db.StringField(max_length=255, verbose_name='送检地址')
-    send_note = db.StringField(verbose_name='送检说明')
-    list_pic = db.ImageField(verbose_name='列表配图')
-    list_desc = db.StringField(max_length=255, verbose_name='列表描述')  # 列表简介
-    desc_pic = db.ImageField(verbose_name='详情大图')
-    desc_detail = db.ImageField(verbose_name='产品简介')  # 详细项目简介
-    desc_content = db.ImageField(verbose_name='检测内容')  # 详细检测内容
-    desc_note = db.ImageField(verbose_name='注意事项')  # 详细注意事项
-    prod_info = db.StringField(verbose_name='产品信息')  # 项目所需填写内容
-    prod_template = db.StringField(verbose_name='产品模板URL')  # 项目所需填写模板
+    list_swipers = db.ListField(db.EmbeddedDocumentField(OnePicture, verbose='轮播图list'))
+    list_desc = db.ListField(db.EmbeddedDocumentField(OnePicture, verbose='详情图list'))
 
-    known_issues = db.StringField(verbose_name='知情同意书')  # 知情同意书
-    known_issues_patient = db.StringField(verbose_name='受检者同意书')  # 受检者同意书
-
-    sender = db.StringField(max_length=255, verbose_name='发件寄件人')
-    sender_phone = db.StringField(max_length=255, verbose_name='发件寄件手机')
-    sender_address = db.StringField(max_length=255, verbose_name='发件寄件地址')
-
-    returner = db.StringField(max_length=255, verbose_name='回单收件人')
-    returner_phone = db.StringField(max_length=255, verbose_name='回单收件手机')
-    returner_address = db.StringField(max_length=255, verbose_name='回单收件地址')
-    tubetype = db.StringField(max_length=255, verbose_name='试管类型')
-    taketime = db.StringField(max_length=255, verbose_name='取单时间')
-
-
-    credit = db.IntField(default=0, verbose_name='积分')
+    state = db.StringField(max_length=16, default="待上架", verbose_name='商品状态：已上架，待上架，已下架')
 
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
-    hide = db.BooleanField(default=False, verbose_name='隐藏')
 
     def __unicode__(self):
         return str(self.name)
